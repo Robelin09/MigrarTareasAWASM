@@ -4,7 +4,6 @@
 @inject HttpClient httpClient
 @inject IJSRuntime JSRuntime
 
-
 <div class="card">
     <div class="card-header bg-danger text-light">
         <h1 class="mb-0">¿Desea Eliminar?</h1>
@@ -44,7 +43,6 @@
     [Parameter]
     public int ClienteId { get; set; }
     public Clientes cliente { get; set; } = new Clientes();
-
 
     protected override async Task OnInitializedAsync()
     {

@@ -4,7 +4,6 @@
 @inject HttpClient httpClient
 @inject IJSRuntime JSRuntime
 
-
 <PageTitle>Editor de Clientes</PageTitle>
 <EditForm Model="cliente" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
@@ -72,7 +71,6 @@
             await Buscar();
         }
     }
-
     private async Task<Clientes> BuscarCliente(int ClienteId)
     {
         Clientes cliente = new Clientes();
@@ -81,7 +79,6 @@
             return cliente = clienteEncontrado;
         return new Clientes();
     }
-
     public async Task Buscar()
     {
         var clienteEncontrado = (await httpClient.GetFromJsonAsync<List<Clientes>>($"api/Clientes"))!

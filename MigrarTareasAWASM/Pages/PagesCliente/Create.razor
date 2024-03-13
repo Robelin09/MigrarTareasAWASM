@@ -80,7 +80,6 @@
             return cliente = clienteEncontrado;
         return new Clientes();
     }
-
     public async Task Buscar()
     {
         var clienteEncontrado = (await httpClient.GetFromJsonAsync<List<Clientes>>($"api/Clientes"))!
