@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Library.Models
 {
-    internal class Tickets
+    public class Tickets
     {
         [Key]
         public int TicketId { get; set; }
