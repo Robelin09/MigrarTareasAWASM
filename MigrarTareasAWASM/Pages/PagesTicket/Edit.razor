@@ -1,0 +1,130 @@
+﻿@page "/EditTicket"
+@page "/EditTicket/{TicketId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Editor de Tickets</PageTitle>
+<EditForm Model="ticket" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card">
+        <div class="card-header">
+            <hi>Editar Ticket</hi>
+        </div>
+        <div class=" card-body">
+            <label>TicketId</label>
+            <div class="input-group">
+                <InputNumber min="0" @bind-Value="ticket.TicketId" class="id-input"></InputNumber>
+            </div>
+            <div>
+                <label>Fecha:</label>
+                <InputDate @bind-Value="ticket.Fecha" class="form-control"></InputDate>
+                <ValidationMessage For="@(() => ticket.Fecha)" />
+            </div>
+
+            <div class="colum-3">
+                <label>Cliente Id:</label>
+                <InputSelect @bind-Value="ticket.ClienteId" class="form-select">
+                    <option value="0">Seleccione el ID del Cliente</option>
+                    @foreach (var item in ListaClientes)
+                    {
+                        <option value="@item.ClienteId">@item.ClienteId</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => ticket.ClienteId)" />
+            </div>
+            <div class="colum-3">
+                <label>Sistema Id:</label>
+                <InputSelect @bind-Value="ticket.SistemaId" class="form-select">
+                    <option value="0">Seleccione el ID del Sistema</option>
+                    @foreach (var item in ListaSistemas)
+                    {
+                        <option value="@item.SistemaId">@item.SistemaId</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => ticket.SistemaId)" />
+            </div>
+            <div class="colum-3">
+                <label>Prioridad Id:</label>
+                <InputSelect @bind-Value="ticket.PrioridadId" class="form-select">
+                    <option value="0">Seleccione el ID de la Prioridad</option>
+                    @foreach (var item in ListaPrioridades)
+                    {
+                        <option value="@item.PrioridadId">@item.PrioridadId</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="@(() => ticket.PrioridadId)" />
+            </div>
+            <div>
+                <label>Solicitado por:</label>
+                <InputText @bind-Value="ticket.SolicitadoPor" class="form-control"></InputText>
+                <ValidationMessage For="@(() => ticket.SolicitadoPor)" />
+            </div>
+            <div>
+                <label>Asunto:</label>
+                <InputText @bind-Value="ticket.Asunto" class="form-control"></InputText>
+                <ValidationMessage For="@(() => ticket.Asunto)" />
+            </div>
+            <div>
+                <label>Descripci&oacuten:</label>
+                <InputText @bind-Value="ticket.Descripcion" class="form-control"></InputText>
+                <ValidationMessage For="@(() => ticket.Descripcion)" />
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+            <button type="submit" class="btn btn-success">Guardar <i class="bi bi-floppy-fill" /></button>
+        </div>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets ticket { get; set; } = new Tickets();
+    public List<Sistemas> ListaSistemas { get; set; } = new List<Sistemas>();
+    public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+    public List<Prioridades> ListaPrioridades { get; set; } = new List<Prioridades>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TicketId > 0)
+        {
+            this.ticket.TicketId = TicketId;
+            await Buscar();
+        }
+        ListaSistemas = (await httpClient.GetFromJsonAsync<List<Sistemas>>("api/Sistemas"))!;
+        ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>("api/Clientes"))!;
+        ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/Prioridades"))!;
+        ticket.Fecha = DateTime.Now;
+    }
+
+    public async Task Buscar()
+    {
+        var ticketEncontrado = (await httpClient.GetFromJsonAsync<List<Tickets>>($"api/Tickets"))!
+        .ToList()
+        .Any(t => t.TicketId == ticket.TicketId);
+        if (ticketEncontrado)
+        {
+            var tickettEncontrado = await httpClient.GetFromJsonAsync<Tickets>($"api/Tickets/{ticket.TicketId}");
+            if (tickettEncontrado != null)
+            {
+                this.ticket = tickettEncontrado;
+                StateHasChanged();
+            }
+        }
+    }
+    public async Task Guardar()
+    {
+        var response = await httpClient.PostAsJsonAsync($"api/Tickets", ticket);
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        StateHasChanged();
+        Navigation.NavigateTo("/IndexTicket");
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexTicket");
+    }
+}
