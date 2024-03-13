@@ -1,0 +1,65 @@
+﻿@page "/ViewCliente"
+@page "/ViewCliente/{ClienteId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+
+<div class="card">
+    <div class="card-header bg-primary text-light">
+        <h1 class="mb-0">Detalles del Cliente</h1>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ClienteId:</dt>
+            <dd class="col-sm-9">@cliente.ClienteId</dd>
+
+            <dt class="col-sm-3">Nombres:</dt>
+            <dd class="col-sm-9">@cliente.Nombres</dd>
+
+            <dt class="col-sm-3">T&eacutelefono:</dt>
+            <dd class="col-sm-9">@cliente.Telefono</dd>
+
+            <dt class="col-sm-3">Celular:</dt>
+            <dd class="col-sm-9">@cliente.Celular</dd>
+
+            <dt class="col-sm-3">RNC:</dt>
+            <dd class="col-sm-9">@cliente.RNC</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@cliente.Email</dd>
+
+            <dt class="col-sm-3">Direcci&oacuten:</dt>
+            <dd class="col-sm-9">@cliente.Direccion</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente { get; set; } = new Clientes();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            var clienteEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"api/Clientes/{ClienteId}");
+            if (clienteEncontrado != null)
+            {
+                cliente = clienteEncontrado;
+
+            }
+        }
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexCliente");
+    }
+
+}
