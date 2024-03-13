@@ -1,0 +1,58 @@
+﻿@page "/IndexCliente"
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+
+<div class="card">
+    <div class="card-header">
+        <h3>Detalles de Clientes</h3>
+        <a href="/CreateCliente" class="btn btn-outline-primary">Crear</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombres</th>
+                    <th>T&eacutelefono</th>
+                    <th>Celular</th>
+                    <th>RNC</th>
+                    <th>Email</th>
+                    <th>Direcci&oacuten</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                    <th>Ver</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in ListaClientes)
+                {
+                    <tr>
+                        <td>@cliente.ClienteId</td>
+                        <td>@cliente.Nombres</td>
+                        <td>@cliente.Telefono</td>
+                        <td>@cliente.Celular</td>
+                        <td>@cliente.RNC</td>
+                        <td>@cliente.Email</td>
+                        <td>@cliente.Direccion</td>
+                        <td><a href="/EditCliente/@cliente.ClienteId" class="bi bi-pencil-square"></a></td>
+                        <td><a href="/DeleteCliente/@cliente.ClienteId" class="bi bi-trash"></a></td>
+                        <td><a href="/ViewCliente/@cliente.ClienteId" class="bi bi-eye"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes cliente { get; set; } = new Clientes();
+    public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaClientes = (await httpClient.GetFromJsonAsync<List<Clientes>>($"api/Clientes"))!;
+    }
+}
