@@ -1,0 +1,56 @@
+﻿@page "/DeleteSistema"
+@page "/DeleteSistema/{SistemaId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="card">
+    <div class="card-header bg-danger text-light">
+        <h1 class="mb-0">¿Desea Eliminar?</h1>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Detalles del Sistema</h5>
+        <dl class="row">
+            <dt class="col-sm-3">TicketId:</dt>
+            <dd class="col-sm-9">@sistema.SistemaId</dd>
+
+            <dt class="col-sm-3">Fecha:</dt>
+            <dd class="col-sm-9">@sistema.NombredeSistema</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+        <button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema { get; set; } = new Sistemas();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            var sistemaEncontrado = await httpClient.GetFromJsonAsync<Sistemas>($"api/Sistemas/{SistemaId}");
+            if (sistemaEncontrado != null)
+            {
+                sistema = sistemaEncontrado;
+            }
+        }
+    }
+    public async Task Eliminar()
+    {
+        var response = await httpClient.DeleteAsync($"api/Sistemas/{sistema.SistemaId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        Atras();
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexSistema");
+    }
+}
