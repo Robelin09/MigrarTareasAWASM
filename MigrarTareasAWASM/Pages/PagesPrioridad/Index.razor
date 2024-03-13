@@ -1,0 +1,47 @@
+﻿@page "/IndexPrioridad"
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="card">
+    <div class="card-header">
+        <h3>Detalles de Prioridades</h3>
+        <a href="/CreatePrioridad" class="btn btn-outline-primary">Crear</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descripción</th>
+                    <th>Días Compromiso</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prioridad in ListaPrioridades)
+                {
+                    <tr>
+                        <td>@prioridad.PrioridadId</td>
+                        <td>@prioridad.Descripcion</td>
+                        <td>@prioridad.DiasCompromiso</td>
+                        <td><a href="/EditPrioridad/@prioridad.PrioridadId" class="bi bi-pencil-square"></a></td>
+                        <td><a href="/DeletePrioridad/@prioridad.PrioridadId" class="bi bi-trash"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int RegistroPrioridadId { get; set; }
+    public Prioridades prioridad { get; set; } = new Prioridades();
+    public List<Prioridades> ListaPrioridades { get; set; } = new List<Prioridades>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>($"api/Prioridades"))!;
+    }
+}
