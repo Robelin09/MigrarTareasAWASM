@@ -71,15 +71,6 @@
             await Buscar();
         }
     }
-    
-    private async Task<Clientes> BuscarCliente(int ClienteId)
-    {
-        Clientes cliente = new Clientes();
-        var clienteEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"api/Clientes/{ClienteId}");
-        if (clienteEncontrado != null)
-            return cliente = clienteEncontrado;
-        return new Clientes();
-    }
 
     public async Task Buscar()
     {

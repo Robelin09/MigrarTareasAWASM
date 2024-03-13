@@ -49,14 +49,6 @@
             await Buscar();
         }
     }
-    private async Task<Prioridades> BuscarPrioridad(int PrioridadId)
-    {
-        Prioridades prioridad = new Prioridades();
-        var prioridadEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"api/Prioridades/{PrioridadId}");
-        if (prioridadEncontrada != null)
-            return prioridad = prioridadEncontrada;
-        return new Prioridades();
-    }
 
     public async Task Buscar()
     {
@@ -72,7 +64,6 @@
                 StateHasChanged();
             }
         }
-
     }
     public async Task Guardar()
     {
