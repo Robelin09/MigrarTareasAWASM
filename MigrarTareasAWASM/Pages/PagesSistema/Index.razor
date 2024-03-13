@@ -1,0 +1,49 @@
+﻿@page "/IndexSistema"
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+
+<div class="card">
+    <div class="card-header">
+        <h3>Detalles de Sistema</h3>
+        <a href="/CreateSistema" class="btn btn-outline-primary">Crear</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>SistemaId</th>
+                    <th>Nombre del Sistema</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                    <th>ver</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sistema in ListaSistemas)
+                {
+                    <tr>
+                        <td>@sistema.SistemaId</td>
+                        <td>@sistema.NombredeSistema</td>
+                        <td><a href="/EditSistema/@sistema.SistemaId" class="bi bi-pencil-square"></a></td>
+                        <td><a href="/DeleteSistema/@sistema.SistemaId" class="bi bi-trash"></a></td>
+                        <td><a href="/ViewSistema/@sistema.SistemaId" class="bi bi-eye"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema { get; set; } = new Sistemas();
+    public List<Sistemas> ListaSistemas { get; set; } = new List<Sistemas>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaSistemas = (await httpClient.GetFromJsonAsync<List<Sistemas>>($"api/Sistemas"))!;
+    }
+}

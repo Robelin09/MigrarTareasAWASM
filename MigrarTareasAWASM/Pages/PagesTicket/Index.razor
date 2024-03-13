@@ -1,0 +1,58 @@
+﻿@page "/IndexTicket"
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="card">
+    <div class="card-header">
+        <h3>Detalles de Tickets</h3>
+        <a href="/CreateTicket" class="btn btn-outline-primary">Crear</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>TicketId</th>
+                    <th>Fecha</th>
+                    <th>ClienteId</th>
+                    <th>SistemaId</th>
+                    <th>PrioridadId</th>
+                    <th>Solicitado por</th>
+                    <th>Asunto</th>
+                    <th>Descripci&oacuten</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                    <th>Ver</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in ListaTickets)
+                {
+                    <tr>
+                        <td>@ticket.TicketId</td>
+                        <td>@ticket.Fecha</td>
+                        <td>@ticket.ClienteId</td>
+                        <td>@ticket.SistemaId</td>
+                        <td>@ticket.PrioridadId</td>
+                        <td>@ticket.SolicitadoPor</td>
+                        <td>@ticket.Asunto</td>
+                        <td>@ticket.Descripcion</td>
+                        <td><a href="/EditTicket/@ticket.TicketId" class="bi bi-pencil-square"></a></td>
+                        <td><a href="/DeleteTicket/@ticket.TicketId" class="bi bi-trash"></a></td>
+                        <td><a href="/ViewTicket/@ticket.TicketId" class="bi bi-eye"></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    public int TicketId { get; set; }
+    public Tickets tickets { get; set; } = new Tickets();
+    public List<Tickets> ListaTickets { get; set; } = new List<Tickets>();
+   
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTickets = (await httpClient.GetFromJsonAsync<List<Tickets>>($"api/Tickets"))!;
+    }
+}
