@@ -1,0 +1,51 @@
+﻿@page "/ViewPrioridad"
+@page "/ViewPrioridad/{PrioridadId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="card">
+    <div class="card-header bg-primary text-light">
+        <h1 class="mb-0">Detalles de la Prioridad</h1>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Detalles de Prioridad</h5>
+        <dl class="row">
+            <dt class="col-sm-3">PrioridadId:</dt>
+            <dd class="col-sm-9">@prioridad.PrioridadId</dd>
+
+            <dt class="col-sm-3">Descripción:</dt>
+            <dd class="col-sm-9">@prioridad.Descripcion</dd>
+
+            <dt class="col-sm-3">Días Compromiso:</dt>
+            <dd class="col-sm-9">@prioridad.DiasCompromiso</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int PrioridadId { get; set; }
+    public Prioridades prioridad { get; set; } = new Prioridades();
+   
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId > 0)
+        {
+            var prioridadEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"api/Prioridades/{PrioridadId}");
+            if (prioridadEncontrada != null)
+            {
+                prioridad = prioridadEncontrada;
+           
+            }
+        }
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexPrioridad");
+    }
+}
