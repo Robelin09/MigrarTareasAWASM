@@ -1,0 +1,75 @@
+﻿@page "/EditSistema"
+@page "/EditSistema/{SistemaId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Editor de Sistemas</PageTitle>
+<EditForm Model="sistema" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card">
+        <div class="cardaccordion-header">
+            <h1>Editar Sistema</h1>
+        </div>
+        <div class="card-body">
+            <label>SistemaId</label>
+            <div class="input-group">
+                <InputNumber min="0" @bind-Value="sistema.SistemaId" class="id-input"></InputNumber>
+            </div>
+            <div>
+                <label>Nombre del Sistema:</label>
+                <InputText @bind-Value="sistema.NombredeSistema" class="form-control"></InputText>
+                <ValidationMessage For="@(() => sistema.NombredeSistema)" />
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+            <button type="submit" class="btn btn-success">Guardar <i class="bi bi-floppy-fill" /></button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas sistema { get; set; } = new Sistemas();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            this.sistema.SistemaId = SistemaId;
+            await Buscar();
+        }
+    }
+    public async Task Buscar()
+    {
+        var sistemaEncontrado = (await httpClient.GetFromJsonAsync<List<Sistemas>>($"api/Sistemas"))!
+        .ToList()
+        .Any(s => s.SistemaId == sistema.SistemaId);
+        if (sistemaEncontrado)
+        {
+            var sistemaaEncontrado = await httpClient.GetFromJsonAsync<Sistemas>($"api/Sistemas/{sistema.SistemaId}");
+            if (sistemaaEncontrado != null)
+            {
+                this.sistema = sistemaaEncontrado;
+                StateHasChanged();
+            }
+        }
+
+    }
+    public async Task Guardar()
+    {
+        var response = await httpClient.PostAsJsonAsync($"api/Sistemas", sistema);
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        StateHasChanged();
+        Navigation.NavigateTo("/IndexSistema");
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexSistema");
+    }
+}
