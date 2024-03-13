@@ -46,7 +46,6 @@
     public int TicketId { get; set; }
     public Tickets ticket { get; set; } = new Tickets();
 
-
     protected override async Task OnInitializedAsync()
     {
         if (TicketId > 0)

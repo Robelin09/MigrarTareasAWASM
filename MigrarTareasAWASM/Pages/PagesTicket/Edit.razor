@@ -97,7 +97,6 @@
         ListaPrioridades = (await httpClient.GetFromJsonAsync<List<Prioridades>>("api/Prioridades"))!;
         ticket.Fecha = DateTime.Now;
     }
-
     public async Task Buscar()
     {
         var ticketEncontrado = (await httpClient.GetFromJsonAsync<List<Tickets>>($"api/Tickets"))!
