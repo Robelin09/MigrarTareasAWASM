@@ -1,0 +1,114 @@
+﻿@page "/CreateCliente"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+
+<PageTitle>Registro de Clientes</PageTitle>
+<EditForm Model="cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
+    <div class="card">
+        <div class="card-header">
+            <h1>Registro de Clientes</h1>
+        </div>
+        <div class="card-body">
+            <label>ID</label>
+            <div class="input-group">
+                <InputNumber min="0" @bind-Value="cliente.ClienteId" class="id-input"></InputNumber>
+            </div>
+            <div>
+                <label>Nombres:</label>
+                <InputText @bind-Value="cliente.Nombres" placeholder="Ej: Robelin Concepcion" class="form-control"></InputText>
+                <ValidationMessage For="@(() => cliente.Nombres)" />
+          
+            </div>
+            <div>
+                <label>T&eacutelefono:</label>
+                <InputText @bind-Value="cliente.Telefono" placeholder="Ej: 8092551542" class="form-control"></InputText>
+                <validationMessage For="@(() => cliente.Telefono)" />
+            </div>
+            <div>
+                <label>Celular:</label>
+                <InputText @bind-Value="cliente.Celular" placeholder="Ej: 8096159699" class="form-control"></InputText>
+                <ValidationMessage For="@(() => cliente.Celular)" />
+            </div>
+            <div>
+                <label>RNC:</label>
+                <InputText @bind-Value="cliente.RNC" placeholder="Ej: 40254845213" class="form-control"></InputText>
+                <ValidationMessage For="@(() => cliente.RNC)" />
+              
+            </div>
+            <div>
+                <label>Email:</label>
+                <InputText @bind-Value="cliente.Email" placeholder="Ej: Fulano@gmail.com" class="form-control"></InputText>
+                <ValidationMessage For="@(() => cliente.Email)" />
+            </div>
+            <div>
+                <label>Direcci&oacuten:</label>
+                <InputText @bind-Value="cliente.Direccion" placeholder="Ej: SFM, Vista Del Valle #25" class="form-control"></InputText>
+                <ValidationMessage For="@(() => cliente.Direccion)" />
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+            <button type="submit" class="btn btn-outline-success">Guardar <i class="bi bi-floppy-fill" /></button>
+        </div>
+    </div>
+</EditForm> 
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+
+    public Clientes cliente { get; set; } = new Clientes();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ClienteId > 0)
+        {
+            this.cliente.ClienteId = ClienteId;
+            await Buscar();
+        }
+    }
+    
+    private async Task<Clientes> BuscarCliente(int ClienteId)
+    {
+        Clientes cliente = new Clientes();
+        var clienteEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"api/Clientes/{ClienteId}");
+        if (clienteEncontrado != null)
+            return cliente = clienteEncontrado;
+        return new Clientes();
+    }
+
+    public async Task Buscar()
+    {
+        var clienteEncontrado = (await httpClient.GetFromJsonAsync<List<Clientes>>($"api/Clientes"))!
+        .ToList()
+        .Any(c => c.ClienteId == cliente.ClienteId);
+        if (clienteEncontrado)
+        {
+            var clienteeEncontrado = await httpClient.GetFromJsonAsync<Clientes>($"api/Clientes/{cliente.ClienteId}");
+            if (clienteeEncontrado != null)
+            {
+                this.cliente = clienteeEncontrado;
+                StateHasChanged();
+            }
+        }
+
+    }
+    public async Task Guardar()
+    {
+        var response = await httpClient.PostAsJsonAsync($"api/Clientes", cliente);
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        StateHasChanged();
+        Navigation.NavigateTo("/IndexCliente");
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexCliente");
+    }
+}
