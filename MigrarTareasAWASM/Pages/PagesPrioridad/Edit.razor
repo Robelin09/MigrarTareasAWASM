@@ -1,0 +1,92 @@
+﻿@page "/EditPrioridad"
+@page "/EditPrioridad/{PrioridadId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Editor de Prioridades</PageTitle>
+
+<EditForm Model="prioridad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card">
+        <div class="card-header">
+            <h1>Editor de Prioridades</h1>
+        </div>
+        <div class="card-body">
+            <label>ID:</label>
+            <div class="input-group">
+                <InputNumber @bind-Value="prioridad.PrioridadId" class="id-input"></InputNumber>
+            </div>
+            <div>
+                <label>Descripci&oacuten:</label>
+                <InputText @bind-Value="prioridad.Descripcion" class="form-control"></InputText>
+                <ValidationMessage For="@(() => prioridad.Descripcion)" />
+            </div>
+            <div>
+                <label>D&iacuteas Compromiso</label>
+                <InputNumber @bind-Value="prioridad.DiasCompromiso" class="form-control"></InputNumber>
+                <ValidationMessage For="@(() => prioridad.DiasCompromiso)" />
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+            <button type="submit" class="btn btn-success">Guardar <i class="bi bi-floppy-fill"></i></button>
+        </div>
+    </div>
+    <h3>@Mensaje</h3>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int PrioridadId { get; set; }
+    public string Mensaje = " ";
+    public Prioridades prioridad { get; set; } = new Prioridades();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (PrioridadId > 0)
+        {
+            this.prioridad.PrioridadId = PrioridadId;
+            await Buscar();
+        }
+    }
+    private async Task<Prioridades> BuscarPrioridad(int PrioridadId)
+    {
+        Prioridades prioridad = new Prioridades();
+        var prioridadEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"api/Prioridades/{PrioridadId}");
+        if (prioridadEncontrada != null)
+            return prioridad = prioridadEncontrada;
+        return new Prioridades();
+    }
+
+    public async Task Buscar()
+    {
+        var prioridadEncontrada = (await httpClient.GetFromJsonAsync<List<Prioridades>>($"api/Prioridades"))!
+        .ToList()
+        .Any(p => p.PrioridadId == prioridad.PrioridadId);
+        if (prioridadEncontrada)
+        {
+            var prioridaddEncontrada = await httpClient.GetFromJsonAsync<Prioridades>($"api/Prioridades/{prioridad.PrioridadId}");
+            if (prioridaddEncontrada != null)
+            {
+                this.prioridad = prioridaddEncontrada;
+                StateHasChanged();
+            }
+        }
+
+    }
+    public async Task Guardar()
+    {
+        var response = await httpClient.PostAsJsonAsync($"api/Prioridades", prioridad);
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        StateHasChanged();
+        Navigation.NavigateTo("/IndexPrioridad");
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexPrioridad");
+    }
+}
