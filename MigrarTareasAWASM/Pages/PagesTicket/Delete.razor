@@ -1,0 +1,75 @@
+﻿@page "/DeleteTicket"
+@page "/DeleteTicket/{TicketId:int}"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject IJSRuntime JSRuntime
+
+<div class="card">
+    <div class="card-header bg-danger text-light">
+        <h1 class="mb-0">¿Desea Eliminar?</h1>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">Detalles del Tickets</h5>
+        <dl class="row">
+            <dt class="col-sm-3">TicketId:</dt>
+            <dd class="col-sm-9">@ticket.TicketId</dd>
+
+            <dt class="col-sm-3">Fecha:</dt>
+            <dd class="col-sm-9">@ticket.Fecha</dd>
+
+            <dt class="col-sm-3">ClienteId:</dt>
+            <dd class="col-sm-9">@ticket.ClienteId</dd>
+
+            <dt class="col-sm-3">SistemaId:</dt>
+            <dd class="col-sm-9">@ticket.SistemaId</dd>
+
+            <dt class="col-sm-3">PrioridadId:</dt>
+            <dd class="col-sm-9">@ticket.PrioridadId</dd>
+
+            <dt class="col-sm-3">Solicitado por:</dt>
+            <dd class="col-sm-9">@ticket.SolicitadoPor</dd>
+
+            <dt class="col-sm-3">Asunto:</dt>
+            <dd class="col-sm-9">@ticket.Asunto</dd>
+
+            <dt class="col-sm-3">Descripci&oacuten:</dt>
+            <dd class="col-sm-9">@ticket.Descripcion</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <button type="button" class="btn btn-outline-primary" @onclick="Atras">Volver <i class="bi bi-arrow-return-left" /></button>
+        <button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets ticket { get; set; } = new Tickets();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TicketId > 0)
+        {
+            var ticketEncontrado = await httpClient.GetFromJsonAsync<Tickets>($"api/Tickets/{TicketId}");
+            if (ticketEncontrado != null)
+            {
+                ticket = ticketEncontrado;
+            }
+        }
+    }
+    public async Task Eliminar()
+    {
+        var response = await httpClient.DeleteAsync($"api/Tickets/{ticket.TicketId}");
+        if (!response.IsSuccessStatusCode)
+        {
+            return;
+        }
+        Atras();
+    }
+    void Atras()
+    {
+        Navigation.NavigateTo("/IndexTicket");
+    }
+
+}
